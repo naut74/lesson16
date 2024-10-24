@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Circle</title>
+</head>
+<body>
+    
+    <script>
+        let Circle = function(radius) {
+            this.radius = radius;
+            this.getRadius = function() {
+                return this.radius;
+            };
+            this.getArea = function() {
+                return Math.PI * Math.pow(this.radius, 2);
+            };
+        };
+        let circle = new Circle(2);
+        let radius = circle.getRadius();  // Output: 2
+        let area = circle.getArea(); // Output: 12.566370614359172
+        alert("Radius: " + radius + ", Area: " + area.toFixed(2));
+    </script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temperature</title>
+    <style>
+        body {
+            margin-left: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Temperature</h2>
+    <p id="Fahrenheit"></p>
+    <script>
+        function Temperature(celsius) {
+            this.celsius = celsius;
+            this.setCelsius = function(celsius) {
+                this.celsius = celsius;
+            }
+            this.convertFahrenheit = function() {
+                return (this.celsius * 9/5) + 32;
+            }
+        }
+        let temperature = new Temperature(0);
+        temperature.setCelsius(25);
+        document.getElementById("Fahrenheit").innerText = `${temperature.celsius}°C is equal to ${temperature.convertFahrenheit().toFixed(2)}°F`;
+
+    </script>
+</body>
+</html>

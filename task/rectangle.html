@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rectangle</title>
+    <style>
+        body{
+            margin: 20px;
+            font-family: Arial, sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <h1>Rectangle</h1>
+    <canvas id="createRectangle"></canvas>
+    <p id="rectangle-info"></p>
+    <script>
+         function rectangle(height, width) {
+            this.height = height;
+            this.width = width;
+
+            this.calculateArea = function() {
+                return this.height * this.width;
+            };
+            this.calculatePerimeter = function() {
+                return 2 * (this.height + this.width);
+            };
+            this.draw = function(ctx) {
+                ctx.beginPath();
+                ctx.rect(0, 0, this.width, this.height);
+                ctx.stroke();
+                ctx.fillStyle = "green";
+                ctx.fill();
+            };
+        };
+        let myRectangle=new rectangle(50, 100);
+
+        let canvas = document.getElementById("createRectangle");
+        let ctx = canvas.getContext("2d");
+        myRectangle.draw(ctx);
+
+        let info = document.getElementById("rectangle-info");
+        info.innerHTML = "Height: " + myRectangle.height + ", Width: " + myRectangle.width + ", Area: " + myRectangle.calculateArea() + ", Perimeter: " + myRectangle.calculatePerimeter();
+    </script>
+</body>
+</html>

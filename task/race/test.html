@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ninja Game</title>
+    <link rel="stylesheet" href="css/style.css"/>
+</head>
+<body onkeydown="gameBoard.moveNinja(event)">
+    <canvas id="gameCanvas" width="500px" height="500px"></canvas>
+
+    <script >
+        const GAMEBOARD_WIDTH = 500;
+const GAMEBOARD_HEIGHT = 500;
+
+const ORIENTATION_LEFT = "left";
+const ORIENTATION_RIGHT = "right";
+const ORIENTATION_UP = "up";
+const ORIENTATION_DOWN = "down";
+
+const NINJA_WIDTH = 59;
+const NINJA_HEIGHT = 86;
+
+const DEFAULT_NINJA_X_POSITION = 100;
+const DEFAULT_NINJA_Y_POSITION = 100;
+const DEFAULT_NINJA_ORIENTATION = ORIENTATION_DOWN;
+const DEFAULT_NINJA_SPEED = 20;
+
+function Ninja() {
+    this.xPosition = DEFAULT_NINJA_X_POSITION;
+    this.yPosition = DEFAULT_NINJA_Y_POSITION;
+    this.orientation = DEFAULT_NINJA_ORIENTATION;
+    this.speed = DEFAULT_NINJA_SPEED;
+    this.step = 1;
+    this.imageCache = {};
+
+    // Preload images to avoid reloading on every frame
+    this.loadImage = (orientation, step) => {
+        const imageName = `${orientation}${step}.png`;
+        if (!this.imageCache[imageName]) {
+            const img = new Image();
+            img.src = `./images/${imageName}`;
+            this.imageCache[imageName] = img;
+        }
+        return this.imageCache[imageName];
+    };
+
+    this.buildImage = () => {
+        this.currentImage = this.loadImage(this.orientation, this.step);
+    };
+
+    this.move = () => {
+        switch (this.orientation) {
+            case ORIENTATION_DOWN:
+                this.yPosition = Math.min(this.yPosition + this.speed, GAMEBOARD_HEIGHT - NINJA_HEIGHT);
+                break;
+            case ORIENTATION_UP:
+                this.yPosition = Math.max(this.yPosition - this.speed, 0);
+                break;
+            case ORIENTATION_LEFT:
+                this.xPosition = Math.max(this.xPosition - this.speed, 0);
+                break;
+            case ORIENTATION_RIGHT:
+                this.xPosition = Math.min(this.xPosition + this.speed, GAMEBOARD_WIDTH - NINJA_WIDTH);
+                break;
+        }
+
+        this.step = this.step === 1 ? 2 : 1;
+        this.buildImage();
+    };
+
+    this.turn = (orientation) => {
+        if (this.orientation !== orientation) {
+            this.orientation = orientation;
+            this.step = 1;
+            this.buildImage();
+        }
+    };
+
+    this.show = (ctx) => {
+        ctx.drawImage(this.currentImage, this.xPosition, this.yPosition);
+    };
+
+    this.buildImage(); // Initialize the first image
+}
+
+function GameBoard() {
+    this.ninja = new Ninja();
+    this.ctx = undefined;
+    this.isAnimating = false;
+
+    this.start = () => {
+        this.ctx = document.getElementById('gameCanvas').getContext('2d');
+        this.render();
+    };
+
+    this.render = () => {
+        this.ctx.clearRect(0, 0, GAMEBOARD_WIDTH, GAMEBOARD_HEIGHT);
+        this.ninja.show(this.ctx);
+
+        if (this.isAnimating) {
+            requestAnimationFrame(this.render);
+        }
+    };
+
+    this.moveNinja = (event) => {
+        let orientation = null;
+        switch (event.which) {
+            case 37:
+                orientation = ORIENTATION_LEFT;
+                break;
+            case 38:
+                orientation = ORIENTATION_UP;
+                break;
+            case 39:
+                orientation = ORIENTATION_RIGHT;
+                break;
+            case 40:
+                orientation = ORIENTATION_DOWN;
+                break;
+        }
+
+        if (orientation) {
+            if (this.ninja.orientation !== orientation) {
+                this.ninja.turn(orientation);
+            } else {
+                this.ninja.move();
+            }
+
+            if (!this.isAnimating) {
+                this.isAnimating = true;
+                this.render();
+            }
+        }
+    };
+
+    this.stopAnimation = () => {
+        this.isAnimating = false;
+    };
+}
+
+// Initialize the game
+const gameBoard = new GameBoard();
+gameBoard.start();
+
+window.addEventListener('keydown', (event) => gameBoard.moveNinja(event));
+window.addEventListener('keyup', () => gameBoard.stopAnimation());
+
+    </script>
+</body>
+</html>

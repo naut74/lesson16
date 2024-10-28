@@ -6,6 +6,7 @@
     <title>Canvas</title>
 </head>
 <body>
+    <canvas id="myCanvas"></canvas>
     <script>
         let c = document.getElementById("myCanvas");
         let ctx = c.getContext("2d");
@@ -17,7 +18,7 @@
         
         //Vẽ hình tròn
         ctx.beginPath();
-        ctx.arc(95,50,40,0,2*Math.PI);
+        ctx.arc(95,50,40,0,2*Math.PI);  //ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI, false); 
         ctx.stroke();
 
         //Vẽ chữ

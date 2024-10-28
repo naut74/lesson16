@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UFO Game</title>
+    <style>
+        canvas {
+            border: 1px solid rgb(228, 170, 170);
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas" width="800" height="600" style="background-color: antiquewhite;"></canvas>
+    <p>Score: <span id="score">0</span></p>
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        let ufo, score, obstacles, coins;
+
+        function resetGame() {
+            // Reset UFO to the starting position
+            ufo = {
+                x: canvas.width / 2,
+                y: canvas.height / 2,
+                radius: 20,
+            };
+
+            // Reset score
+            score = 0;
+            document.getElementById('score').innerText = score;
+
+            // Clear obstacles and coins, then generate new ones
+            obstacles = [];
+            coins = [];
+            createRandomObstacles(20);
+            createRandomCoins(10);
+        }
+
+        function drawUfo() {
+            ctx.beginPath();
+            ctx.arc(ufo.x, ufo.y, ufo.radius, 0, Math.PI * 2); 
+            ctx.fillStyle = 'lightpurple';
+            ctx.fill();
+            ctx.lineWidth = 5;
+            ctx.strokeStyle = 'purple';
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.arc(ufo.x, ufo.y, ufo.radius / 2, 0, Math.PI * 2);
+            ctx.fillStyle = 'lightblue';
+            ctx.fill();
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = 'blue';
+            ctx.stroke();
+        }
+
+        function moveUfo(x, y) {
+            ufo.x += x;
+            ufo.y += y;
+
+            ufo.x = Math.max(ufo.radius, Math.min(canvas.width - ufo.radius, ufo.x));
+            ufo.y = Math.max(ufo.radius, Math.min(canvas.height - ufo.radius, ufo.y));
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
+            drawUfo(); 
+        }
+
+        // Keydown event listener
+        window.addEventListener('keydown', function(event) {
+            switch (event.key) {
+                case 'ArrowUp':
+                    moveUfo(0, -10);
+                    break;
+                case 'ArrowDown':
+                    moveUfo(0, 10);
+                    break;
+                case 'ArrowLeft':
+                    moveUfo(-10, 0);
+                    break;
+                case 'ArrowRight':
+                    moveUfo(10, 0);
+                    break;
+            }
+        });
+
+        function createRandomObstacles(n) {
+            for (let i = 0; i < n; i++) {
+                let obs = {
+                    x: Math.random() * (canvas.width - 50),
+                    y: Math.random() * (canvas.height - 50),
+                    width: 50,
+                    height: 50
+                };
+                obstacles.push(obs);
+            }
+        }
+
+        function drawObstacles() {
+            ctx.fillStyle = 'red';
+            for (let i = 0; i < obstacles.length; i++) {
+                let obs = obstacles[i];
+                ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
+            }
+        }
+
+        function isCollision(ufo, obs) {
+            let closestX = Math.max(obs.x, Math.min(ufo.x, obs.x + obs.width));
+            let closestY = Math.max(obs.y, Math.min(ufo.y, obs.y + obs.height));
+
+            let distanceX = ufo.x - closestX;
+            let distanceY = ufo.y - closestY;
+            let distanceSquared = distanceX * distanceX + distanceY * distanceY;
+
+            return distanceSquared <= ufo.radius * ufo.radius;
+        }
+
+        function checkCollisions() {
+            for (let i = 0; i < obstacles.length; i++) {
+                if (isCollision(ufo, obstacles[i])) {
+                    alert('Game Over!');
+                    resetGame();  // Reset the game without reloading the page
+                }
+            }
+        }
+
+        function createRandomCoins(n) {
+            for (let i = 0; i < n; i++) {
+                let coin = {
+                    x: Math.random() * (canvas.width - 20),
+                    y: Math.random() * (canvas.height - 20),
+                    radius: 10
+                };
+                coins.push(coin);
+            }
+        }
+
+        function drawCoins() {
+            ctx.fillStyle = 'yellow';
+            for (let i = 0; i < coins.length; i++) {
+                let coin = coins[i];
+                ctx.beginPath();
+                ctx.arc(coin.x, coin.y, coin.radius, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function checkCoinCollection() {
+            for (let i = 0; i < coins.length; i++) {
+                let coin = coins[i];
+                let distanceX = ufo.x - coin.x;
+                let distanceY = ufo.y - coin.y;
+                let distanceSquared = distanceX * distanceX + distanceY * distanceY;
+
+                if (distanceSquared <= (ufo.radius + coin.radius) * (ufo.radius + coin.radius)) {
+                    coins.splice(i, 1);  // Remove the coin
+                    score += 10;
+                    document.getElementById('score').innerText = score;
+                }
+            }
+        }
+
+        function updateGame() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
+            drawUfo(); 
+            drawObstacles();
+            drawCoins();
+            checkCollisions();
+            checkCoinCollection();
+            requestAnimationFrame(updateGame); // Continuously update the game
+        }
+
+        resetGame(); // Initialize the game state
+        updateGame();
+    </script>
+</body>
+</html>
